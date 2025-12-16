@@ -1,0 +1,47 @@
+version: '3.9'
+
+services:
+  gateway:
+    build: .
+    image: am-nginx-gateway:latest
+    container_name: am-nginx-gateway
+    ports:
+      - "8080:80"
+    depends_on:
+      - service1
+      - service2
+    networks:
+      - am-net
+
+  service1:
+    image: hashicorp/http-echo:0.2.3
+    container_name: am-service1
+    command: ["-text=service1 OK"]
+    networks:
+      - am-net
+
+  service2:
+    image: hashicorp/http-echo:0.2.3
+    container_name: am-service2
+    command: ["-text=service2 OK"]
+    networks:
+      - am-net
+
+  test-runner:
+    build:
+      context: ./scripts
+      dockerfile: Dockerfile.test
+    container_name: am-test-runner
+    depends_on:
+      - gateway
+    networks:
+      - am-net
+    environment:
+      - GATEWAY_URL=http://gateway:80/health
+      - SERVICE1_URL=http://gateway:80/api/service1/
+      - SERVICE2_URL=http://gateway:80/api/service2/
+    command: /scripts/test-deploy.sh
+
+networks:
+  am-net:
+    driver: bridge
