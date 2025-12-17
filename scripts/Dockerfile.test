@@ -1,0 +1,6 @@
+FROM alpine:3.19
+RUN apk add --no-cache curl bash
+COPY ./test-deploy.sh /scripts/test-deploy.sh
+COPY ./test-deploy.env /scripts/test-deploy.env
+RUN chmod +x /scripts/test-deploy.sh
+CMD ["/scripts/test-deploy.sh"]

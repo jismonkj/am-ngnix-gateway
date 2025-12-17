@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: am-test-runner
+spec:
+  template:
+    spec:
+      containers:
+      - name: test-runner
+        image: am-test-runner:latest
+        env:
+        - name: GATEWAY_URL
+          value: "http://am-nginx-gateway/health"
+        - name: SERVICE1_URL
+          value: "http://am-nginx-gateway/api/service1/"
+        - name: SERVICE2_URL
+          value: "http://am-nginx-gateway/api/service2/"
+        command: ["/scripts/test-deploy.sh"]
+      restartPolicy: Never
+  backoffLimit: 1
